@@ -157,7 +157,11 @@ build/fs-tmp-%/binutils/bfd/libbfd.a: build/fs-env-%.rc build/fs-tmp-%/binutils/
 define make-plain-module-rules
 build/.$1-stamp:
 	$(RM) -r $1
-	git clone $(REPO_BASE_URL)/$1$(REPO_SUFFIX)
+	ifeq ($1, glib)
+		git clone https://github.com/jivaro/glib		
+	else
+		git clone $(REPO_BASE_URL)/$1$(REPO_SUFFIX)
+	endif
 	@mkdir -p $$(@D)
 	@touch $$@
 
