@@ -2,9 +2,13 @@ MAKE_J ?= -j 8
 REPO_BASE_URL = "git://github.com/frida"
 REPO_SUFFIX = ".git"
 
-build_platform := $(shell uname -s | tr '[A-Z]' '[a-z]' | sed 's,^darwin$$,mac,')
-build_arch := $(shell uname -m)
-build_platform_arch := $(build_platform)-$(build_arch)
+build_platform = mac
+#$(shell uname -s | tr '[A-Z]' '[a-z]' | sed 's,^darwin$$,mac,')
+
+build_arch = i386
+#$(shell uname -m)
+
+build_platform_arch = $(build_platform)-$(build_arch)
 
 ifeq ($(build_platform), linux)
 download := wget -O - -q
@@ -20,9 +24,13 @@ endif
 ifdef FRIDA_HOST
 	host_arch := $(shell echo $(FRIDA_HOST) | cut -f2 -d"-")
 else
-	host_arch := $(shell uname -m)
+	host_arch := "i386"
+#$(shell uname -m)
 endif
-host_platform_arch := $(host_platform)-$(host_arch)
+
+host_platform = mac
+host_arch = i386
+host_platform_arch = $(host_platform)-$(host_arch)
 
 
 ifeq ($(host_platform), linux)
@@ -32,7 +40,6 @@ ifeq ($(host_platform), android)
 	iconv := build/fs-%/lib/libiconv.a
 	bfd := build/fs-%/lib/libbfd.a
 endif
-
 
 all: build/sdk-$(host_platform)-$(host_arch).tar.bz2
 	@echo ""
@@ -56,7 +63,7 @@ build/fs-tmp-%/.package-stamp: \
 		build/fs-%/lib/pkgconfig/glib-2.0.pc \
 		build/fs-%/lib/pkgconfig/gee-0.8.pc \
 		build/fs-%/lib/pkgconfig/json-glib-1.0.pc \
-		build/fs-%/lib/pkgconfig/v8.pc
+		#build/fs-%/lib/pkgconfig/v8.pc
 	$(RM) -r $(@D)/package
 	mkdir -p $(@D)/package
 	cd build/fs-$* \
@@ -171,7 +178,6 @@ $(eval $(call make-plain-module-rules,libffi,libffi,))
 $(eval $(call make-plain-module-rules,glib,glib-2.0,$(iconv)))
 $(eval $(call make-plain-module-rules,libgee,gee-0.8,build/fs-%/lib/pkgconfig/glib-2.0.pc))
 $(eval $(call make-plain-module-rules,json-glib,json-glib-1.0,build/fs-%/lib/pkgconfig/glib-2.0.pc))
-
 
 ifeq ($(host_arch), i386)
 	v8_arch := ia32
